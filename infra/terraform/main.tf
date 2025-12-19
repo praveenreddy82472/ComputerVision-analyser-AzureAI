@@ -1,6 +1,7 @@
-# Phase 1 resources will be added here step-by-step:
-# - Resource Group
-# - Log Analytics Workspace
-# - Container Apps Environment
-# - ACR
-# - Container App
+locals {
+  prefix = lower(var.name_prefix)
+}
+
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
+}

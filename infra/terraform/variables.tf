@@ -4,8 +4,8 @@ variable "location" {
   default     = "eastus"
 }
 
-variable "name_prefix" {
-  description = "Prefix for naming Azure resources (lowercase, no spaces)"
+variable "resource_group_name" {
+  description = "Existing Azure Resource Group name to deploy into"
   type        = string
 }
 
@@ -13,4 +13,9 @@ variable "tags" {
   description = "Tags applied to resources"
   type        = map(string)
   default     = {}
+}
+
+variable "resource_group_name" {
+  description = "Existing Azure Resource Group name to deploy into"
+  type        = string
 }
