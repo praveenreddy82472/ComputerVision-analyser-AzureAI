@@ -1,0 +1,81 @@
+name: Build & Deploy to Azure Container Apps
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RG: ${{ secrets.AZURE_RG }}
+  APP_NAME: cv-analyser-api
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set image tag
+        id: vars
+        run: echo "IMAGE=${{ env.ACR_LOGIN_SERVER }}/cv-analyser:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Login to ACR
+        run: az acr login --name "${{ secrets.ACR_NAME }}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.vars.outputs.IMAGE }}
+
+      # Store secrets in Container App (idempotent: safe to re-run)
+      - name: Set Container App secrets
+        run: |
+          az containerapp secret set \
+            --name "${{ env.APP_NAME }}" \
+            --resource-group "${{ env.RG }}" \
+            --secrets \
+              azure-vision-endpoint="${{ secrets.AZURE_VISION_ENDPOINT }}" \
+              azure-vision-key="${{ secrets.AZURE_VISION_KEY }}" \
+              docintel-endpoint="${{ secrets.DOCINTEL_ENDPOINT }}" \
+              docintel-key="${{ secrets.DOCINTEL_KEY }}" \
+              azure-openai-endpoint="${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
+              azure-openai-key="${{ secrets.AZURE_OPENAI_API_KEY }}" \
+              azure-openai-deployment="${{ secrets.AZURE_OPENAI_DEPLOYMENT }}" \
+              azure-storage-connection-string="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+              azure-storage-container="${{ secrets.AZURE_STORAGE_CONTAINER }}"
+
+      # Map app env vars to secrets + deploy new image
+      - name: Deploy image + set env vars
+        run: |
+          az containerapp update \
+            --name "${{ env.APP_NAME }}" \
+            --resource-group "${{ env.RG }}" \
+            --image "${{ steps.vars.outputs.IMAGE }}" \
+            --set-env-vars \
+              PORT=8000 \
+              AZURE_VISION_ENDPOINT=secretref:azure-vision-endpoint \
+              AZURE_VISION_KEY=secretref:azure-vision-key \
+              DOCINTEL_ENDPOINT=secretref:docintel-endpoint \
+              DOCINTEL_KEY=secretref:docintel-key \
+              AZURE_OPENAI_ENDPOINT=secretref:azure-openai-endpoint \
+              AZURE_OPENAI_API_KEY=secretref:azure-openai-key \
+              AZURE_OPENAI_DEPLOYMENT=secretref:azure-openai-deployment \
+              AZURE_STORAGE_CONNECTION_STRING=secretref:azure-storage-connection-string \
+              AZURE_STORAGE_CONTAINER=secretref:azure-storage-container
