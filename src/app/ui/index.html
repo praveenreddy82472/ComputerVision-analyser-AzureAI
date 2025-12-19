@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CV Analyzer</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <h1>Computer Vision Analyzer</h1>
+      <p>Upload an image or a PDF. The app routes it to the right analyzer automatically.</p>
+    </header>
+
+    <section class="card">
+      <div class="row">
+        <input id="file" type="file" accept="image/*,application/pdf" />
+        <button id="analyzeBtn">Analyze</button>
+      </div>
+
+      <div class="row status">
+        <span id="status">Idle</span>
+      </div>
+
+      <div class="preview">
+        <div class="previewBox">
+          <div class="label">Preview</div>
+          <div id="previewArea" class="previewArea">
+            <div class="muted">Choose a file to preview it.</div>
+          </div>
+        </div>
+
+        <div class="previewBox">
+          <div class="label">Meta</div>
+          <div class="kv">
+            <div><span class="k">Type:</span> <span id="metaType" class="v">-</span></div>
+            <div><span class="k">Job ID:</span> <span id="metaJob" class="v">-</span></div>
+            <div><span class="k">Blob URL:</span> <a id="metaBlob" class="v" href="#" target="_blank" rel="noreferrer">-</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="summary">Summary</button>
+        <button class="tab" data-tab="vision">Vision</button>
+        <button class="tab" data-tab="document">Document</button>
+        <button class="tab" data-tab="raw">Raw JSON</button>
+      </div>
+
+      <div class="tabpanes">
+        <div class="pane active" id="pane-summary">
+          <div id="summary" class="block muted">No result yet.</div>
+        </div>
+
+        <div class="pane" id="pane-vision">
+          <div id="vision" class="block muted">No vision result yet.</div>
+        </div>
+
+        <div class="pane" id="pane-document">
+          <pre id="document" class="block muted">No document result yet.</pre>
+        </div>
+
+        <div class="pane" id="pane-raw">
+          <pre id="raw" class="block muted">No result yet.</pre>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

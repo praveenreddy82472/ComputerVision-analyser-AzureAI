@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# Python cache / env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+ENV/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build / tooling
+dist/
+build/
+*.egg-info/
+
+# Local secrets/config
+.env
+.env.*
+*.pem
+*.key
+
+# Logs
+*.log
