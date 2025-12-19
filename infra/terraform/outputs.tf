@@ -14,3 +14,11 @@ output "log_analytics_workspace_id" {
 output "container_app_environment_id" {
   value = azurerm_container_app_environment.cae.id
 }
+
+output "acr_name" {
+  value = azurerm_container_registry.acr.name
+}
+
+output "acr_login_server" {
+  value = azurerm_container_registry.acr.login_server
+}
