@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  RG: ${{ secrets.AZURE_RG }}
+  RG: cv_analysis
   APP_NAME: cv-analyser-api
   ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
 
