@@ -29,6 +29,19 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = false
 }
 
+# NEW: User Assigned Identity used for ACR pulls
+resource "azurerm_user_assigned_identity" "acr_pull" {
+  name                = "${local.prefix}-acr-pull"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+# NEW: Grant AcrPull to the UAMI on ACR
+resource "azurerm_role_assignment" "uami_acr_pull" {
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.acr_pull.principal_id
+}
 
 resource "azurerm_container_app" "api" {
   name                         = "${local.prefix}-api"
@@ -37,7 +50,13 @@ resource "azurerm_container_app" "api" {
   revision_mode                = "Single"
 
   identity {
-    type = "SystemAssigned"
+    type         = "SystemAssigned, UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.acr_pull.id]
+  }
+
+  registry {
+    server   = azurerm_container_registry.acr.login_server
+    identity = azurerm_user_assigned_identity.acr_pull.id
   }
 
   template {
@@ -52,6 +71,9 @@ resource "azurerm_container_app" "api" {
         value = "8000"
       }
     }
+
+    min_replicas = 1
+    max_replicas = 10
   }
 
   ingress {
@@ -64,10 +86,6 @@ resource "azurerm_container_app" "api" {
       latest_revision = true
     }
   }
-}
 
-resource "azurerm_role_assignment" "aca_acr_pull" {
-  scope                = azurerm_container_registry.acr.id
-  role_definition_name = "AcrPull"
-  principal_id         = azurerm_container_app.api.identity[0].principal_id
+  depends_on = [azurerm_role_assignment.uami_acr_pull]
 }
