@@ -19,3 +19,32 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+
+# =========================
+# Cosmos DB (SQL API)
+# =========================
+
+variable "cosmos_endpoint" {
+  type      = string
+  sensitive = true
+}
+
+variable "cosmos_key" {
+  type      = string
+  sensitive = true
+}
+
+variable "cosmos_db_name" {
+  type    = string
+  default = "cv_analyser"
+}
+
+variable "cosmos_container_name" {
+  type    = string
+  default = "analyses"
+}
+
+
+
+

@@ -16,7 +16,7 @@ def summarize_vision(vision: dict) -> str:
     ocr = vision.get("ocr_text") or ""
 
     prompt = f"""
-You are an assistant that writes a short, factual summary of an image using ONLY the extracted signals below.
+You are an assistant that writes a 200 words short, factual summary of an image using ONLY the extracted signals below.
 If OCR text exists, mention it. If not, don't invent text.
 
 CAPTION: {caption}

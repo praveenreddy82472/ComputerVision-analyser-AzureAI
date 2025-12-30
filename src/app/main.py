@@ -4,11 +4,13 @@ from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from datetime import datetime, timezone
 
 from .vision_client import analyze_image_bytes
 from .blob_client import upload_image_to_blob
 from .openai_client import summarize_vision
 from .docintel_client import extract_layout_bytes
+from src.app.db.cosmos import upsert_analysis
 
 app = FastAPI(title="CV Analyzer Backend")
 
@@ -47,14 +49,27 @@ async def analyze_image(file: UploadFile = File(...)):
         vision = analyze_image_bytes(image_bytes)
         summary = summarize_vision(vision)
 
-        return {
+        result = {
+            "id": blob_info["job_id"],  # Cosmos document id
+            "userId": "default",        # Partition key value (update later if you add auth)
+            "createdAt": datetime.now(timezone.utc).isoformat(),
+
             "job_id": blob_info["job_id"],
             "type": "image",
+            "fileName": file.filename,
+            "contentType": file.content_type,
+
             "blob_url": blob_info["blob_url"],
             "openai_summary": summary,
             "vision": vision,
             "document_intelligence": None,
         }
+
+        # ✅ Save to Cosmos automatically
+        upsert_analysis(result)
+
+        return result
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -75,13 +90,26 @@ async def analyze_document(file: UploadFile = File(...)):
         doc_result = extract_layout_bytes(data)
         job_id = str(uuid.uuid4())
 
-        return {
+        result = {
+            "id": job_id,               # Cosmos document id
+            "userId": "default",        # Partition key value
+            "createdAt": datetime.now(timezone.utc).isoformat(),
+
             "job_id": job_id,
             "type": "document",
+            "fileName": file.filename,
+            "contentType": file.content_type,
+
             "blob_url": None,
-            "openai_summary": None,  # later we can summarize doc text too
+            "openai_summary": None,  # later you can summarize doc_result["content"]
             "vision": None,
-            "document_intelligence": doc_result,  # {"content": "..."}
+            "document_intelligence": doc_result,
         }
+
+        # ✅ Save to Cosmos automatically
+        upsert_analysis(result)
+
+        return result
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

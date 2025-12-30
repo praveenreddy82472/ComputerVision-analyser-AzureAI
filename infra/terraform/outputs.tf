@@ -30,3 +30,22 @@ output "container_app_name" {
 output "container_app_fqdn" {
   value = azurerm_container_app.api.latest_revision_fqdn
 }
+
+output "cosmos_db_name" {
+  value = var.cosmos_db_name
+}
+
+output "cosmos_container_name" {
+  value = var.cosmos_container_name
+}
+
+output "cosmos_endpoint" {
+  value     = var.cosmos_endpoint
+  sensitive = true
+}
+
+output "cosmos_primary_key" {
+  value     = var.cosmos_key
+  sensitive = true
+}
+

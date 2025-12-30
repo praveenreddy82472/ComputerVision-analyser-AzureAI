@@ -58,11 +58,86 @@ resource "azurerm_container_app" "api" {
     server   = azurerm_container_registry.acr.login_server
     identity = azurerm_user_assigned_identity.acr_pull.id
   }
+  secret {
+    name                = "azure-storage-connection-string"
+    key_vault_secret_id = azurerm_key_vault_secret.azure_storage_connection_string.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+    secret {
+    name                = "azure-vision-endpoint"
+    key_vault_secret_id = azurerm_key_vault_secret.azure_vision_endpoint.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+
+  secret {
+    name                = "azure-vision-key"
+    key_vault_secret_id = azurerm_key_vault_secret.azure_vision_key.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+    secret {
+    name                = "azure-openai-endpoint"
+    key_vault_secret_id = azurerm_key_vault_secret.azure_openai_endpoint.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+
+  secret {
+    name                = "azure-openai-api-key"
+    key_vault_secret_id = azurerm_key_vault_secret.azure_openai_api_key.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+
+  secret {
+    name                = "azure-openai-deployment"
+    key_vault_secret_id = azurerm_key_vault_secret.azure_openai_deployment.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+
+  secret {
+    name                = "docintel-endpoint"
+    key_vault_secret_id = azurerm_key_vault_secret.docintel_endpoint.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+
+  secret {
+    name                = "docintel-key"
+    key_vault_secret_id = azurerm_key_vault_secret.docintel_key.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+
+  secret {
+    name                = "azure-storage-container"
+    key_vault_secret_id = azurerm_key_vault_secret.azure_storage_container.id
+    identity            = azurerm_user_assigned_identity.acr_pull.id
+  }
+  secret {
+      name                = "cosmos-endpoint"
+      key_vault_secret_id = azurerm_key_vault_secret.cosmos_endpoint.id
+      identity            = azurerm_user_assigned_identity.acr_pull.id
+    }
+
+  secret {
+      name                = "cosmos-key"
+      key_vault_secret_id = azurerm_key_vault_secret.cosmos_key.id
+      identity            = azurerm_user_assigned_identity.acr_pull.id
+    }
+
+  secret {
+      name                = "cosmos-db-name"
+      key_vault_secret_id = azurerm_key_vault_secret.cosmos_db_name.id
+      identity            = azurerm_user_assigned_identity.acr_pull.id
+    }
+
+  secret {
+      name                = "cosmos-container-name"
+      key_vault_secret_id = azurerm_key_vault_secret.cosmos_container_name.id
+      identity            = azurerm_user_assigned_identity.acr_pull.id
+    }
+
 
   template {
     container {
       name   = "api"
-      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      image  = "${azurerm_container_registry.acr.login_server}/${var.image_name}:${var.image_tag}"
       cpu    = 0.5
       memory = "1Gi"
 
@@ -70,6 +145,68 @@ resource "azurerm_container_app" "api" {
         name  = "PORT"
         value = "8000"
       }
+      env {
+        name        = "AZURE_STORAGE_CONNECTION_STRING"
+        secret_name = "azure-storage-connection-string"
+      }
+      env {
+        name        = "AZURE_VISION_ENDPOINT"
+        secret_name = "azure-vision-endpoint"
+      }
+
+      env {
+        name        = "AZURE_VISION_KEY"
+        secret_name = "azure-vision-key"
+      }
+      env { 
+        name = "AZURE_OPENAI_ENDPOINT"    
+        secret_name = "azure-openai-endpoint" 
+      }
+      env { 
+        name = "AZURE_OPENAI_API_KEY"     
+        secret_name = "azure-openai-api-key" 
+      }
+      env { 
+        name = "AZURE_OPENAI_DEPLOYMENT"  
+        secret_name = "azure-openai-deployment" 
+      }
+
+      env { 
+        name = "DOCINTEL_ENDPOINT"        
+        secret_name = "docintel-endpoint" 
+      }
+      env { 
+        name = "DOCINTEL_KEY"             
+        secret_name = "docintel-key" 
+      }
+
+      env { 
+        name = "AZURE_STORAGE_CONTAINER"  
+        secret_name = "azure-storage-container" 
+      }
+      env {
+        name        = "COSMOS_ENDPOINT"
+        secret_name = "cosmos-endpoint"
+      }
+
+      env {
+        name        = "COSMOS_KEY"
+        secret_name = "cosmos-key"
+      }
+
+      env {
+        name        = "COSMOS_DB_NAME"
+        secret_name = "cosmos-db-name"
+      }
+
+      env {
+        name        = "COSMOS_CONTAINER_NAME"
+        secret_name = "cosmos-container-name"
+      }
+
+
+
+
     }
 
     min_replicas = 1
@@ -89,3 +226,4 @@ resource "azurerm_container_app" "api" {
 
   depends_on = [azurerm_role_assignment.uami_acr_pull]
 }
+
