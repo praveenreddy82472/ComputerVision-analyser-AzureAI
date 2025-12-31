@@ -2,6 +2,9 @@ import os
 from azure.cosmos import CosmosClient
 import uuid
 from datetime import datetime, timezone
+import logging
+logger = logging.getLogger("cosmos")
+
 
 _client = None
 _container = None
@@ -22,8 +25,11 @@ def get_container():
     _client = CosmosClient(endpoint, credential=key)
     db = _client.get_database_client(db_name)
     _container = db.get_container_client(container_name)
+    logger.warning(
+            f"COSMOS runtime db={db_name} container={container_name} "
+            f"endpoint_set={bool(endpoint)} key_set={bool(key)}"
+            )
     return _container
-
 
 def upsert_analysis(item: dict) -> dict:
     c = get_container()
