@@ -1,5 +1,7 @@
 import os
 from azure.cosmos import CosmosClient
+import uuid
+from datetime import datetime, timezone
 
 _client = None
 _container = None
@@ -25,7 +27,14 @@ def get_container():
 
 def upsert_analysis(item: dict) -> dict:
     c = get_container()
+
+    # required for Cosmos + your partition key
+    item.setdefault("id", str(uuid.uuid4()))
+    item.setdefault("userId", "default")
+    item.setdefault("createdAt", datetime.now(timezone.utc).isoformat())
+
     return c.upsert_item(item)
+
 
 
 def get_analysis(item_id: str, user_id: str = "default") -> dict | None:
