@@ -50,8 +50,9 @@ The output JSON can later be stored, visualized in a UI, or consumed by other sy
 - The design matches how enterprise AI pipelines are built  
 
 ---
+## Architecture Diagram
 
-## Architecture
+![Architecture](docs/architecture.png)
 
 
 
