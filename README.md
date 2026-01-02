@@ -53,3 +53,37 @@ The output JSON can later be stored, visualized in a UI, or consumed by other sy
 
 ## Architecture
 
+
+
+---
+
+## Infrastructure & deployment model
+
+- The application runs as a container
+- Infrastructure is provisioned using Infrastructure as Code
+- Secrets and API keys are stored securely, never in code
+- CI/CD automatically builds and deploys the app
+- Centralized logging is enabled for production visibility
+
+This allows the system to be redeployed, scaled, or modified without manual setup.
+
+---
+
+## Project status
+
+- Core functionality completed  
+- Successfully deployed on Azure  
+- Stable and production-ready foundation  
+- Designed for future extensions (UI, database storage, authentication)
+
+---
+
+## Key takeaway
+
+This project is not about using one AI service.
+
+It is about **building a complete AI system**:
+from ingestion → processing → structuring → deployment → monitoring.
+
+That is what makes it production-grade.
+
