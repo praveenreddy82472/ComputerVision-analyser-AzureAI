@@ -52,7 +52,7 @@ The output JSON can later be stored, visualized in a UI, or consumed by other sy
 ---
 ## Architecture Diagram
 
-![Architecture](docs/architecture.png)
+![Architecture](https://github.com/praveenreddy82472/ComputerVision-analyser-AzureAI/blob/main/cv_a.png)
 
 
 
